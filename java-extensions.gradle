@@ -1,0 +1,88 @@
+// набор методов для расширения функциональности сборки проектов на основе плагина Java
+
+// Использование JDK указанной версии
+def changeUsedJDK(JavaVersion version) {
+
+    def variableName = "JDK_${version.toString().replace('.', '_')}_HOME"
+    def jdkDirPath = System.getenv()[variableName]
+    assert (jdkDirPath != null): "Environment variable $variableName is not defined. Please define it locating to the JDK $version root directory"
+
+    def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows()
+
+    def executableExtension = isWindows ? ".exe" : ""
+
+    // see https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_cross_compilation
+
+    def javaExecutablesPath = new File(jdkDirPath, 'bin')
+    def javaExecutables = [:].withDefault { String execName ->
+
+        def executable = new File(javaExecutablesPath, execName + executableExtension)
+        assert executable.exists(): "There is no ${execName} executable in ${javaExecutablesPath}"
+        executable
+    }
+
+    println "Using JDK version ${version} from \"${jdkDirPath}\""
+
+    sourceCompatibility = getMinVersion(sourceCompatibility, version)
+    targetCompatibility = version
+
+    tasks.withType(AbstractCompile) {
+
+        dependsOn 'clean'
+
+        options.with {
+            fork = true
+            forkOptions.executable = javaExecutables.javac
+        }
+    }
+
+    tasks.withType(Javadoc) {
+
+        dependsOn 'clean'
+
+        executable = javaExecutables.javadoc
+    }
+
+    tasks.withType(Test) {
+        dependsOn 'clean'
+        executable = javaExecutables.java
+    }
+
+    tasks.withType(JavaExec) {
+
+        dependsOn 'clean'
+
+        executable = javaExecutables.java
+    }
+}
+
+def getJavaUsed() {
+    def current = JavaVersion.current()
+    if (targetCompatibility == null)
+        current
+    else
+        getMinVersion(current, targetCompatibility)
+}
+
+def setDefaultEncoding(encoding) {
+
+    tasks.withType(JavaCompile) {
+        options.encoding = encoding
+    }
+
+    tasks.withType(Javadoc) {
+        options.encoding = encoding
+    }
+}
+
+static getMinVersion(JavaVersion version1, JavaVersion version2) {
+    if (version1.ordinal() < version2.ordinal())
+        version1
+    else
+        version2
+}
+
+// Export this class
+ext {
+    javaExtensions = this
+}
