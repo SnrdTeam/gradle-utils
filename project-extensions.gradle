@@ -1,0 +1,15 @@
+
+def isSnapshot() {
+
+    version.contains("SNAPSHOT")
+}
+
+def isRelease() {
+
+    !isSnapshot()
+}
+
+// Export this class
+ext {
+    projectExtensions = this
+}

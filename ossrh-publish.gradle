@@ -11,10 +11,11 @@ buildscript {
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: io.codearte.gradle.nexus.NexusStagingPlugin
+apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/master/project-extensions.gradle'
 
 repositories {
 
-    if (isSnapshot())
+    if (projectExtensions.isSnapshot())
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots/"
         }
@@ -34,7 +35,7 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-if (isRelease())
+if (projectExtensions.isRelease())
     signing {
         sign configurations.archives
     }
@@ -43,7 +44,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
 
-            if (isRelease())
+            if (projectExtensions.isRelease())
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             def ossrhUsername = project.hasProperty("ossrhUsername") ? project.property("ossrhUsername") : null
@@ -69,7 +70,7 @@ task checkSnapshot {
 
     doLast {
 
-        assert isSnapshot() : "Not a snapshot"
+        assert projectExtensions.isSnapshot() : "Not a snapshot"
     }
 }
 
@@ -77,16 +78,6 @@ task checkRelease {
 
     doLast {
 
-        assert isRelease() : "Not a release"
+        assert projectExtensions.isRelease() : "Not a release"
     }
-}
-
-def isSnapshot() {
-
-    version.contains("SNAPSHOT")
-}
-
-def isRelease() {
-
-    !isSnapshot()
 }
