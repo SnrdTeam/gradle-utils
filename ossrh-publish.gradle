@@ -65,6 +65,22 @@ nexusStaging {
     delayBetweenRetriesInMillis = 5000
 }
 
+task checkSnapshot {
+
+    doLast {
+
+        assert isSnapshot() : "Not a snapshot"
+    }
+}
+
+task checkRelease {
+
+    doLast {
+
+        assert isRelease() : "Not a release"
+    }
+}
+
 def isSnapshot() {
 
     version.contains("SNAPSHOT")
