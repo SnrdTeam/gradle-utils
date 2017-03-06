@@ -75,6 +75,20 @@ def setDefaultEncoding(encoding) {
     }
 }
 
+def emitEntryPoint() {
+
+    jar {
+    
+        manifest {
+        
+            attributes(
+                    'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class': mainClassName
+            )
+        }
+    }
+}
+
 static getMinVersion(JavaVersion version1, JavaVersion version2) {
     if (version1.ordinal() < version2.ordinal())
         version1
