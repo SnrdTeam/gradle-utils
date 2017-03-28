@@ -1,3 +1,4 @@
+// Утилиты для работы с плагинами для публикации артефактов в Maven: `maven`,`io.codearte.gradle.nexus.NexusStagingPlugin`.
 
 buildscript {
     repositories {
@@ -66,6 +67,7 @@ nexusStaging {
     delayBetweenRetriesInMillis = 5000
 }
 
+// Проверка того, что данный версия данного проекта - SNAPSHOT
 task checkSnapshot {
 
     doLast {
@@ -74,6 +76,7 @@ task checkSnapshot {
     }
 }
 
+// Проверка того, что данный версия данного проекта - релиз
 task checkRelease {
 
     doLast {

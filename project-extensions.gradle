@@ -1,9 +1,12 @@
+// Утилиты для работы с экземпляром класса `org.gradle.Project`.
 
+// Проверка того, что версия проекта - SNAPSHOT
 def isSnapshot() {
 
     version.contains("SNAPSHOT")
 }
 
+// Проверка того, что версия проекта - релиз
 def isRelease() {
 
     !isSnapshot()

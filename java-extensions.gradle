@@ -56,6 +56,7 @@ def changeUsedJDK(JavaVersion version) {
     }
 }
 
+// Получение версии используемого JDK
 def getJavaUsed() {
     def current = JavaVersion.current()
     if (targetCompatibility == null)
@@ -64,6 +65,7 @@ def getJavaUsed() {
         getMinVersion(current, targetCompatibility)
 }
 
+// Установка кодировки, в которой читаются исходники Java
 def setDefaultEncoding(encoding) {
 
     tasks.withType(JavaCompile) {
@@ -75,6 +77,8 @@ def setDefaultEncoding(encoding) {
     }
 }
 
+// Добавление информации о точке входа в приложение в манифест jar-файла.
+// Данный метод должен вызываться после указания зависимостей проекта
 def emitEntryPoint() {
 
     jar {
@@ -89,6 +93,7 @@ def emitEntryPoint() {
     }
 }
 
+// Получение минимальной из двух указанных JavaVersion
 static getMinVersion(JavaVersion version1, JavaVersion version2) {
     if (version1.ordinal() < version2.ordinal())
         version1
