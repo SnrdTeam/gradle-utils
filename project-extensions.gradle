@@ -12,6 +12,33 @@ def isRelease() {
     !isSnapshot()
 }
 
+// Проверка того, что все зависимости проекта (рекурсивно) имеют релизные версии
+def validateProjectReleaseDependencies(Project project) {
+
+    def validRelease = true
+
+    project.configurations.compile.allDependencies.each { Dependency dependency ->
+
+        if(dependency.version.contains("SNAPSHOT"))
+            validRelease = false
+        if (dependency.hasProperty("dependencyProject"))
+            validRelease &= validateProjectReleaseDependencies(dependency.dependencyProject)
+    }
+
+    return validRelease
+}
+
+task validateRelease {
+
+    description = "Validate if project is ready for Release"
+
+    doLast {
+
+        assert !project.version.contains("SNAPSHOT") : "Project version is invalid"
+        assert validateProjectReleaseDependencies(project) : "There are a SNAPSHOT dependencies"
+    }
+}
+
 // Export this class
 ext {
     projectExtensions = this
