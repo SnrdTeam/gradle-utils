@@ -19,7 +19,7 @@ def validateProjectReleaseDependencies(Project project) {
 
     project.configurations.compile.allDependencies.each { Dependency dependency ->
 
-        if(dependency.version.contains("SNAPSHOT"))
+        if(dependency.version != null && dependency.version.contains("SNAPSHOT"))
             validRelease = false
         if (dependency.hasProperty("dependencyProject"))
             validRelease &= validateProjectReleaseDependencies(dependency.dependencyProject)
