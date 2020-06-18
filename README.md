@@ -7,6 +7,7 @@
   * project-extensions
   * java-extensions
   * ossrh-extensions
+  * dependency-licenses
 
 ## project-extensions
 
@@ -42,6 +43,18 @@ apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/master/java
 
 ```groovy
 apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/master/ossrh-publish.gradle'
+```
+
+## dependency-licenses
+
+Утилиты для проверки лицензий сторонних библиотек, подключенных в качестве зависимостей проекта.
+
+### Использование
+
+В файле .gradle добавьте
+
+```groovy
+apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/dependency-licenses-v1.0/dependency-licenses.gradle'
 ```
 
 ## Лицензия

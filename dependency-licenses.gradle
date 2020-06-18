@@ -1,0 +1,55 @@
+/**
+ * Third-party dependency licenses validation utils.
+ *
+ * version: 1.0.0
+ */
+
+import groovy.json.JsonSlurper
+
+/**
+ * Registers task for verifying 3rd party dependency licenses against a JSON data file.
+ *
+ * Checks registered (not resolved) dependencies for 'implementation' configuration.
+ *
+ * Required following structure of JSON file (other dta in file are ignored):
+ * <pre>
+ *{ "dependencies": [
+ *{"artifactId": "[group]:[name]:[version]", "license": "[License name]" },
+ *{ ... }  ],
+ * "licenses": [ { "name": "[License name]" }, { ... } ]
+ *}</pre>
+ *
+ * @param licensesFile A JSON file that stores information about 3rd party dependency licenses.
+ */
+void createCheckDependencyLicensesTask(File licensesFile) {
+    task('checkDependencyLicenses') {
+        doFirst {
+            def jsonSlurper = new JsonSlurper()
+            def licensesJson = jsonSlurper.parse(licensesFile)
+            def licenses = licensesJson.licenses
+            def dependencyLicenses = licensesJson.dependencies
+
+            def projectDependencies = project.configurations.implementation.dependencies.toList()
+            def failed = false
+            projectDependencies.forEach { projectDependency ->
+                def projectDependencyArtifactId = "${projectDependency.group}:${projectDependency.name}:${projectDependency.version}"
+                def dependencyLicense = dependencyLicenses.find { dependencyLicenseData -> dependencyLicenseData.artifactId == projectDependencyArtifactId }
+                if (dependencyLicense != null) {
+                    if (!licenses.any { license -> license.name == dependencyLicense.license }) {
+                        project.logger.error "License '${dependencyLicense.license}' of '${dependencyLicense.artifactId}' artifact not found. Check 'licenses' array."
+                        failed = true
+                    }
+                } else {
+                    project.logger.error "License for artifact '${projectDependency.group}:${projectDependency.name}:${projectDependency.version}' not found."
+                    failed = true
+                }
+            }
+            if (failed) throw new GradleException("Licenses not found for some artifacts. See gradle output for details.")
+        }
+    }.configure {
+        group = "Verification"
+        description = "Check whether dependency licenses are listed in '${project.relativePath(licensesFile)}'"
+    }
+}
+
+ext.createCheckDependencyLicensesTask = this.&createCheckDependencyLicensesTask
