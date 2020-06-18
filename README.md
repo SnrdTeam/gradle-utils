@@ -55,6 +55,8 @@ apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/master/ossr
 
 ```groovy
 apply from: 'https://raw.githubusercontent.com/SnrdTeam/gradle-utils/dependency-licenses-v1.0/dependency-licenses.gradle'
+createCheckDependencyLicensesTask(project.file('/src/main/res/raw/licenses.json'))
+preBuild.dependsOn checkDependencyLicenses
 ```
 
 ## Лицензия
